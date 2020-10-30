@@ -4,34 +4,34 @@ import (
 	"sync"
 )
 
-type pooln struct {
+type Pooln struct {
 	new func(n int) interface{}
 	l   sync.RWMutex
 	m   map[int]*sync.Pool
 }
 
-// New .
-func New(newFunc func(int) interface{}) *pooln {
-	return &pooln{
+// New
+func New(newFunc func(int) interface{}) *Pooln {
+	return &Pooln{
 		m:   make(map[int]*sync.Pool),
 		new: newFunc,
 	}
 }
 
-// Get returns the result of calling the Get method on the pool at `n`.
-func (p *pooln) Get(n int) interface{} {
+// Get calls the `Get` method on the pool at `n` and returns the result.
+func (p *Pooln) Get(n int) interface{} {
 	x := p.pool(n).Get()
 	return x
 }
 
-// Put adds x to the pool at `n` by calling the pools Put method.
-func (p *pooln) Put(n int, x interface{}) {
+// Put adds `x` to the pool at `n` by calling the pool's `Put` method.
+func (p *Pooln) Put(n int, x interface{}) {
 	p.pool(n).Put(x)
 }
 
 // pool returns the pool at `n`. If there is no pool at `n`, it creates new one,
 // puts it in the map and returns it.
-func (p *pooln) pool(n int) *sync.Pool {
+func (p *Pooln) pool(n int) *sync.Pool {
 	p.l.RLock()
 	v, ok := p.m[n]
 	p.l.RUnlock()
